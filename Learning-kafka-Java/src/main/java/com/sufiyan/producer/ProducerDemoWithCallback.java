@@ -65,25 +65,29 @@ public class ProducerDemoWithCallback {
 		 * conduktor UI or cli
 		 */
 
-		ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("demo_java",
-				"Hello producer with callBack 😊!!!");
+		// Now send multiple messages at a time to a topic
+		for (int i = 0; i < 10; i++) {
+			ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("demo_java",
+					"Hello producer with callBack 😊!!! " + i);
 
-		// while sending data add callBack.
-		producer.send(producerRecord, new Callback() {
+			// while sending data add callBack.
+			producer.send(producerRecord, new Callback() {
 
-			public void onCompletion(RecordMetadata metadata, Exception e) {
-				// Executes every time a record successfully sent or exception is thrown.
-				if (e == null) {
-					// means the record successfully sent.
-					log.info("Received new metadata \n" + "Topics: " + metadata.topic() + "\n" + "Partition: "
-							+ metadata.partition() + "\n" + "Offsets: " + metadata.offset() + "\n" + "TimeStamp: "
-							+ metadata.timestamp());
-				} else {
-					log.error("Error while producing " + e);
+				public void onCompletion(RecordMetadata metadata, Exception e) {
+					// Executes every time a record successfully sent or exception is thrown.
+					if (e == null) {
+						// means the record successfully sent.
+						log.info("Received new metadata \n" + "Topics: " + metadata.topic() + "\n" + "Partition: "
+								+ metadata.partition() + "\n" + "Offsets: " + metadata.offset() + "\n" + "TimeStamp: "
+								+ metadata.timestamp());
+					} else {
+						log.error("Error while producing " + e);
+					}
+
 				}
+			});
+		}
 
-			}
-		});
 		// tell the producer to send all data and block until done --synchronous way.
 		producer.flush();
 
