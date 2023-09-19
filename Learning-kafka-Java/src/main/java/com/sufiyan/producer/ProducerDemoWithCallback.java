@@ -30,7 +30,7 @@ public class ProducerDemoWithCallback {
 
 	private static final Logger log = LoggerFactory.getLogger(ProducerDemoWithCallback.class.getSimpleName());
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		log.info("This is a producer with callback class !!!");
 
 		// Create Producer properties
@@ -54,6 +54,9 @@ public class ProducerDemoWithCallback {
 		properties.setProperty("key.serializer", StringSerializer.class.getName());
 		properties.setProperty("value.serializer", StringSerializer.class.getName());
 
+		// To demonstrate StickyPartitionar set batch properties.
+		properties.setProperty("batch.size", "400");
+
 		// Create Producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
@@ -65,27 +68,32 @@ public class ProducerDemoWithCallback {
 		 * conduktor UI or cli
 		 */
 
-		// Now send multiple messages at a time to a topic
-		for (int i = 0; i < 10; i++) {
-			ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("demo_java",
-					"Hello producer with callBack 😊!!! " + i);
+		// Send more messages and set sleep time to demonstrate StickyPartitionar.
+		for (int j = 0; j < 10; j++) {
+			// Now send multiple messages at a time to a topic
+			for (int i = 0; i < 30; i++) {
+				ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("demo_java",
+						"Hello producer with callBack 😊!!! " + i);
 
-			// while sending data add callBack.
-			producer.send(producerRecord, new Callback() {
+				// while sending data add callBack.
+				producer.send(producerRecord, new Callback() {
 
-				public void onCompletion(RecordMetadata metadata, Exception e) {
-					// Executes every time a record successfully sent or exception is thrown.
-					if (e == null) {
-						// means the record successfully sent.
-						log.info("Received new metadata \n" + "Topics: " + metadata.topic() + "\n" + "Partition: "
-								+ metadata.partition() + "\n" + "Offsets: " + metadata.offset() + "\n" + "TimeStamp: "
-								+ metadata.timestamp());
-					} else {
-						log.error("Error while producing " + e);
+					public void onCompletion(RecordMetadata metadata, Exception e) {
+						// Executes every time a record successfully sent or exception is thrown.
+						if (e == null) {
+							// means the record successfully sent.
+							log.info("Received new metadata \n" + "Topics: " + metadata.topic() + "\n" + "Partition: "
+									+ metadata.partition() + "\n" + "Offsets: " + metadata.offset() + "\n"
+									+ "TimeStamp: " + metadata.timestamp());
+						} else {
+							log.error("Error while producing " + e);
+						}
+
 					}
+				});
 
-				}
-			});
+				Thread.sleep(00);
+			}
 		}
 
 		// tell the producer to send all data and block until done --synchronous way.
