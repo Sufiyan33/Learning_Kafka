@@ -1,15 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.sufiyan</groupId>
-  <artifactId>kafka-producer-wikimedia</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Kafka Producer wikimedia real time project</name>
-  <description>Kafka Producer wikimedia real time project</description>
-  
-  <properties>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.sufiyan</groupId>
+	<artifactId>kafka-producer-wikimedia</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Kafka Producer wikimedia real time project</name>
+	<description>Kafka Producer wikimedia real time project</description>
+	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
@@ -31,6 +29,17 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>2.0.9</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.11.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.launchdarkly/okhttp-eventsource -->
+		<dependency>
+			<groupId>com.launchdarkly</groupId>
+			<artifactId>okhttp-eventsource</artifactId>
+			<version>4.1.1</version>
+		</dependency>
 	</dependencies>
-	
 </project>
