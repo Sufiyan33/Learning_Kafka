@@ -1,11 +1,15 @@
 package com.sufiyan.wikimedia;
 
+import java.net.URI;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+
+import com.launchdarkly.eventsource.EventHandler;
+import com.launchdarkly.eventsource.EventSource;
 
 public class WikiMediaChangesProducer {
 
@@ -26,14 +30,14 @@ public class WikiMediaChangesProducer {
 		String topic = "wikimedia.recentchange";
 
 		// Now create EventHandler to trigger event.
+		EventHandler eventhandler = new WikimediaChangeHandler(producer, topic);
 		String url = "https://stream.wikimedia.org/v2/stream/recentchange";
 
-		// EventSource.Builder builder = new EventSource.Builder(eventHandler,
-		// URI.create(url));
-//		EventSource eventsource = builder.build();
+		EventSource.Builder builder = new EventSource.Builder(eventhandler, URI.create(url));
+		EventSource eventsource = builder.build();
 
 		// Start the producer in another thread.
-		// eventsource.start();
+		eventsource.start();
 
 		// we produce for 10 minutes and block the program until then.
 		TimeUnit.MINUTES.sleep(10);
