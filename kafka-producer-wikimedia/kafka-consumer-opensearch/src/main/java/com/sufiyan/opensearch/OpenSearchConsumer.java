@@ -124,10 +124,16 @@ public class OpenSearchConsumer {
 				log.info("Recieved: " + recordCount + "record(s)");
 
 				for (ConsumerRecord<String, String> record : records) {
+
 					// send the record to open search.
-					IndexRequest indexRequest = new IndexRequest("wikimedia").source(record.value(), XContentType.JSON);
-					IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
-					log.info(response.getId());
+					try {
+						IndexRequest indexRequest = new IndexRequest("wikimedia").source(record.value(),
+								XContentType.JSON);
+						IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+						log.info(response.getId());
+					} catch (Exception e) {
+
+					}
 				}
 			}
 		}
