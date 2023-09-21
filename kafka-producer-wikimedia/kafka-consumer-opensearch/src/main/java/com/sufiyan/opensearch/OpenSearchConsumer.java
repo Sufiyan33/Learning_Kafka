@@ -28,6 +28,8 @@ import org.opensearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonParser;
+
 public class OpenSearchConsumer {
 	/*
 	 * Here we are going to create below things :
@@ -88,6 +90,11 @@ public class OpenSearchConsumer {
 		return new KafkaConsumer<String, String>(properties);
 	}
 
+	private static String extractId(String json) {
+		// gson library;
+		return JsonParser.parseString(json).getAsJsonObject().get("meta").getAsJsonObject().get("id").getAsString();
+	}
+
 	public static void main(String[] args) throws IOException {
 		Logger log = LoggerFactory.getLogger(OpenSearchConsumer.class.getSimpleName());
 
@@ -124,11 +131,26 @@ public class OpenSearchConsumer {
 				log.info("Recieved: " + recordCount + "record(s)");
 
 				for (ConsumerRecord<String, String> record : records) {
+					/*
+					 * Now let's make consumer idempotence. There are two way to do that.
+					 * 
+					 * 1 : Define an id using kafka Record coordinations & pass to indexRequest.
+					 * 
+					 * 2 : Extract value from Json meta which all messages have & pass to
+					 * indexRequest.
+					 */
+
+					// Strategy 1 :
+					String id = record.topic() + "_" + record.partition() + "_" + record.offset();
+					log.info("id coming from coordination: " + id);
 
 					// send the record to open search.
 					try {
-						IndexRequest indexRequest = new IndexRequest("wikimedia").source(record.value(),
-								XContentType.JSON);
+
+						// Strategy 2 :
+						String id1 = extractId(record.value());
+						IndexRequest indexRequest = new IndexRequest("wikimedia")
+								.source(record.value(), XContentType.JSON).id(id1);
 						IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
 						log.info(response.getId());
 					} catch (Exception e) {
