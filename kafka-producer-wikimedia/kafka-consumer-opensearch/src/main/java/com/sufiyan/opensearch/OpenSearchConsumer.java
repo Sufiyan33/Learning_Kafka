@@ -17,8 +17,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
-import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestHighLevelClient;
@@ -46,8 +47,10 @@ public class OpenSearchConsumer {
 	// Step 1 :
 	@SuppressWarnings("resource")
 	public static RestHighLevelClient createOpenSearchClient() {
-		String connString = "http://localhost:9200"; // docker local host url.
-		// String connString = ""; // you can also use bonsai cosol url.
+		// String connString = "http://localhost:9200"; // docker local host url.
+
+		// you can also use bonsai console url.
+		String connString = "https://q23tie8tnn:oe1b2upz5y@kafka-course-7622103079.us-east-1.bonsaisearch.net:443";
 
 		// We build a uri from connection string.
 		RestHighLevelClient restHighLevelClient;
@@ -96,7 +99,7 @@ public class OpenSearchConsumer {
 		return JsonParser.parseString(json).getAsJsonObject().get("meta").getAsJsonObject().get("id").getAsString();
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		Logger log = LoggerFactory.getLogger(OpenSearchConsumer.class.getSimpleName());
 
 		// Step 1 :
@@ -131,6 +134,9 @@ public class OpenSearchConsumer {
 				int recordCount = records.count();
 				log.info("Recieved: " + recordCount + "record(s)");
 
+				// let's process bulk request & set every index to it.
+				BulkRequest bulkRequest = new BulkRequest();
+
 				for (ConsumerRecord<String, String> record : records) {
 					/*
 					 * Now let's make consumer idempotence. There are two way to do that.
@@ -152,17 +158,28 @@ public class OpenSearchConsumer {
 						String id1 = extractId(record.value());
 						IndexRequest indexRequest = new IndexRequest("wikimedia")
 								.source(record.value(), XContentType.JSON).id(id1);
-						IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
-						log.info(response.getId());
+
+						// IndexResponse response = openSearchClient.index(indexRequest,
+						// RequestOptions.DEFAULT);
+						// log.info(response.getId());
+
+						bulkRequest.add(indexRequest);
 					} catch (Exception e) {
 
 					}
 				}
-				/*
-				 * Once the whole batch consumed then do commit offsets.
-				 */
-				consumer.commitSync();
-				log.info("Offsets have been comiited😊 !!!");
+
+				if (bulkRequest.numberOfActions() > 0) {
+					BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+					log.info("Inserted: " + bulkResponse.getItems().length + " reocrd(s). ");
+					Thread.sleep(1000);
+					/*
+					 * Once the whole batch consumed then do commit offsets.
+					 */
+					consumer.commitSync();
+					log.info("Offsets have been comiited😊 !!!");
+				}
+
 			}
 		}
 
