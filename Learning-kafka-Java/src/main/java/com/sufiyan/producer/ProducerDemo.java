@@ -3,6 +3,7 @@ package com.sufiyan.producer;
 import java.util.Properties;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -50,6 +51,8 @@ public class ProducerDemo {
 		// Set producer properties
 		properties.setProperty("key.serializer", StringSerializer.class.getName());
 		properties.setProperty("value.serializer", StringSerializer.class.getName());
+		properties.setProperty(ProducerConfig.ACKS_CONFIG, "0");
+		properties.setProperty("batch.size", "1000");
 
 		// Create Producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
