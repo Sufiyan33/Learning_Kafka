@@ -11,7 +11,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConsumerDemo {
+public class ConsumerDemo1 {
 	/*
 	 * Here, we will create kafka consumer and trying to fetch data from producer.
 	 */
@@ -26,13 +26,13 @@ public class ConsumerDemo {
 	 * Step 4 : flush and close the producer.
 	 */
 
-	private static final Logger log = LoggerFactory.getLogger(ConsumerDemo.class.getSimpleName());
+	private static final Logger log = LoggerFactory.getLogger(ConsumerDemo1.class.getSimpleName());
 
 	public static void main(String[] args) {
 		log.info("I am a kafka Consumer 😊 !!!");
 
-		String groupId = "my-java-application";
-		String topic = "demo-kafka";
+		String groupId = "kafak_KT";
+		String topic = "kafka-topic-number";
 		// Create Consumer properties
 		Properties properties = new Properties();
 
@@ -55,7 +55,7 @@ public class ConsumerDemo {
 		properties.setProperty("key.deserializer", StringDeserializer.class.getName());
 		properties.setProperty("value.deserializer", StringDeserializer.class.getName());
 		properties.setProperty("group.id", groupId);
-		properties.setProperty("auto.offset.reset", "latest");
+		properties.setProperty("auto.offset.reset", "earliest");
 
 		// Connect to Upstash playground
 
