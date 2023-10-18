@@ -1,0 +1,89 @@
+-------------------
+	Local Setup
+-------------------
+-> To do local setup download kafka & extract by using below command :
+	tar -xvzf kafka file source path -C destination path where you want to extract this.
+	Example :
+	tar -xvzf C:\Users\2243881\Downloads\kafka_2.13-3.6.0.tgz -C C:\kafka
+	
+-------------------
+	Playing with CLI
+-------------------
+
+=> To start zookeeper : Open a new terminal and go to location where you unzip kafka & hit below command :
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+=> To start kakfka server : Open a new terminal and go to location where you unzip kafka & hit below command :
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+=> To create topic : Open a new terminal and go to location where you unzip kafka & hit below command :
+.\bin\windows\kafka-topics.bat --create --topic quickstart-events --bootstrap-server localhost:9092
+.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3
+.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 1
+
+.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic kafka-demo-1 --create --partitions 3 --replication-factor 1
+
+=> To describe topic : Open a new terminal and go to location where you unzip kafka & hit below command :
+.\bin\windows\kafka-topics.bat --describe --topic quickstart-events --bootstrap-server localhost:9092
+
+.\bin\windows\kafka-topics.bat --describe --topic Kafka-demo --bootstrap-server localhost:9092
+
+=> Now by using below command you can produce messages
+.\bin\windows\kafka-console-producer.bat --topic quickstart-events --bootstrap-server localhost:9092
+
+=> By using below command you can consume messages
+.\bin\windows\kafka-console-consumer.bat --topic Kafka-demo-2 --from-beginning --bootstrap-server localhost:9092
+
+=> Check the list of available topics
+.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
+
+=> If you want to delete topic then use below command :
+.\bin\windows\kafka-topics.sh --bootstrap-server localhost:9092 --topic quickstart-events --delete
+
+Warning : Please don't execute this command in windows based system, otherwise it leads to crash broker.
+
+Tips : If you have deleted topics mistakenly & your kafka has been crashed then use below command to fix this issue.
+=> For linux os :
+rm -rf /tmp/kafka-logs /tmp/zookeeper
+=> If you are on a Windows machine, you can use the following command
+rmdir /s /q C:\tmp\kafka-logs
+rmdir /s /q C:\tmp\zookeeper
+
+---------------------------
+=> If you are still want to delete topics in local then first set one properties in server.properties
+Go to C:\kafka\kafka_2.13-3.6.0\config\server.properties   and add below line :
+-> delete.topic.enable=true
+-> and then hit below or above command :
+.\bin\windows\kafka-topics.bat — zookeeper localhost:2181 — delete — topic <topic_name>
+
+
+-------------------------------------
+	Kafka-CLI
+-------------------------------------
+To play with kafka cli you need to do below things :
+1- start zookeeper
+2- start kafka server
+3- create a topic (Partition count, Replication factor)
+
+
+-------------------------------------
+	Kafka with spring boot
+-------------------------------------
+Create Producer :
+-> To start writing producer just do below thing :
+	1 : creating spring application
+	2 : Add web dependency
+	3 : Add apache kafka dependency
+	4 : Import project in eclipse
+	5 : start zookeeper
+	6 : start kafka server
+	
+-> Now your application ready to implement producer but before this you need to tell spring that where is my zookeeper & kafka server are running.
+-> For that create application.yml and below properties :
+	spring:
+		kafka:
+			producer:
+				bootstrap-servers: localhost:9092
+				
+-> You can also define port number where you want to run your application.
+
